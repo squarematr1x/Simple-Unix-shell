@@ -46,7 +46,9 @@ int sh_ls(char **args)
             perror("sh");
         } else {
             while (n--) {
-                printf("%s    ", names[n]->d_name);
+                if (names[n]->d_name[0] != '.') {
+                    printf("%s    ", names[n]->d_name);
+                }
                 free(names[n]);
             }
             printf("\n");

@@ -176,6 +176,13 @@ void sh_loop()
 
         free(current_dir);
         free(line);
+
+        int i = 0;
+        while (args[i]) {
+            free(args[i]);
+            i++;
+        }
+
         free(args);
     } while (status);
 }

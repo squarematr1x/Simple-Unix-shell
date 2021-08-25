@@ -61,13 +61,18 @@ int sh_ls(char **args)
 
 int sh_mkdir(char **args)
 {
-    // Check if dir already exists
+    struct stat sb;
+
     if (args[1] == NULL) {
         fprintf(stderr, "sh: expected argument to \"mkdir\"\n");
     } else {
         int i = 1;
         while (args[i]) {
-            mkdir(args[i], 0700);
+            if (!stat(args[i], &sb) && S_ISDIR(sb.st_mode)) {
+                fprintf(stderr, "sh: cannot create dir, %s already exists\n", args[i]);  
+            } else {
+                mkdir(args[i], 0700);
+            }
             i++;
         }
     }
@@ -90,7 +95,8 @@ int sh_touch(char **args)
     return 1;
 }
 
-int is_rf(char* arg) {
+int is_rf(char* arg)
+{
     if (!strcmp(arg, "-r") || !strcmp(arg, "-rf")) {
         return 1;
     }
@@ -98,7 +104,8 @@ int is_rf(char* arg) {
     return 0;
 }
 
-int recursive_option(char **args) {
+int recursive_option(char **args)
+{
     int i = 0;
     int recursive = 0;
 
@@ -113,7 +120,8 @@ int recursive_option(char **args) {
     return recursive;
 }
 
-int rmrf_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf) {
+int rmrf_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
     int rv = remove(fpath);
 
     if (rv) {

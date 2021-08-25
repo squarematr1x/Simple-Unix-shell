@@ -61,6 +61,7 @@ int sh_ls(char **args)
 
 int sh_mkdir(char **args)
 {
+    // Check if dir already exists
     if (args[1] == NULL) {
         fprintf(stderr, "sh: expected argument to \"mkdir\"\n");
     } else {
@@ -89,19 +90,58 @@ int sh_touch(char **args)
     return 1;
 }
 
+int is_rf(char* arg) {
+    if (!strcmp(arg, "-r") || !strcmp(arg, "-rf")) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int recursive_option(char **args) {
+    int i = 0;
+    int recursive = 0;
+
+    while (args[i]) {
+        if (is_rf(args[i])) {
+            recursive = 1;
+            break;
+        }
+        i++;
+    }
+
+    return recursive;
+}
+
+int rmrf_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf) {
+    int rv = remove(fpath);
+
+    if (rv) {
+        perror(fpath);
+    }
+
+    return rv;
+}
+
 int sh_rm(char **args)
 {
+    int recursive_rm = recursive_option(args);
+
     if (args[1] == NULL) {
         fprintf(stderr, "sh: expected argument(s) to \"rm\"\n");
     }
 
     int i = 1;
     while (args[i]) {
-        if (!is_file(args[i])) {
-            fprintf(stderr, "sh: %s is not a file\n", args[i]);
-        } else {
-            if (remove(args[i]) != 0) {
-                fprintf(stderr, "sh: unable to delete file: %s\n", args[i]);
+        if (!is_rf(args[i])) {
+            if (is_dir(args[i]) && recursive_rm) {
+                if (nftw(args[i], rmrf_cb, 64, FTW_DEPTH|FTW_PHYS)) {
+                    fprintf(stderr, "sh: cannot remove file %s\n", args[i]);
+                } 
+            } else {
+                if (remove(args[i]) != 0) {
+                    fprintf(stderr, "sh: unable to delete file: %s\n", args[i]);
+                }
             }
         }
         i++;

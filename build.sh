@@ -1,6 +1,11 @@
 #!/bin/bash
 
 BUILD_BIN="shell"
+BUILD_DIR="build"
+
+if [ -d "${BUILD_DIR}" ]; then
+  make clean
+fi
 
 make
 

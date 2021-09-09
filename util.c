@@ -60,16 +60,37 @@ int valid_mode(char *mode)
     return valid;
 }
 
-void print_tabs(int n_tabs)
+int is_last_branch(int tab_index, int* ignore_tabs, int n) {
+    int last_brach = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (ignore_tabs[i] == tab_index) {
+            last_brach = 1;
+        }
+    }
+
+    return last_brach;
+}
+
+void print_tabs(int n_tabs, int* ignore_tabs, int n)
 {
     for (int i = 0; i < n_tabs; i++) {
-        printf("│");
+        if (is_last_branch(i, ignore_tabs, n)) {
+            printf(" ");
+        } else {
+            printf("│");
+        }
         printf("    ");
     }
 }
 
-void print_tree(char* path, int n_tabs)
+void print_tree(char* path, int n_tabs, int* ignore_tabs, int ignore_index)
 {
+    if (ignore_index + 1 > SH_MAX_TABS) {
+        fprintf(stderr, "sh: too wide tree/subtree to print\n");
+        return;
+    }
+
     struct dirent **names;
     int n;
     n = scandir(path, &names, NULL, alphasort);
@@ -78,12 +99,14 @@ void print_tree(char* path, int n_tabs)
         perror("sh");
     } else {
         for (int i = 0; i < n; i++) {
-            print_tabs(n_tabs);
+            print_tabs(n_tabs, ignore_tabs, ignore_index);
             
             if (i < n - 1) {
                 printf("├── %s\n", names[i]->d_name);
             } else {
                 printf("└── %s\n", names[i]->d_name);
+                ignore_tabs[ignore_index] = n_tabs;
+                ignore_index++;
             }
 
             char* temp_dir = concat(path, "/");
@@ -91,7 +114,7 @@ void print_tree(char* path, int n_tabs)
             free(temp_dir);
 
             if (is_dir(sub_dir)) {
-                print_tree(sub_dir, n_tabs + 1);
+                print_tree(sub_dir, n_tabs + 1, ignore_tabs, ignore_index);
             }
 
             free(sub_dir);

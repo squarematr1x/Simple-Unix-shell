@@ -207,10 +207,11 @@ int sh_tree(char **args)
     if (args[1] != NULL) {
         fprintf(stderr, "sh: invalid argument for \"tree\"\n");
     } else {
+        int ignore_tabs[SH_MAX_TABS];
         char* path = pwd();
 
         printf(".\n");
-        print_tree(path, 0);
+        print_tree(path, 0, ignore_tabs, 0);
         printf("\n");
 
         free(path);

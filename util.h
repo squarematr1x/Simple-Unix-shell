@@ -1,12 +1,12 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "sys/stat.h"
-#include "string.h"
-#include "unistd.h"
-#include "dirent.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <unistd.h>
+#include <dirent.h>
 
 #define SH_DIRNAME_BUFSIZE 100
 #define SH_MAX_TABS 20

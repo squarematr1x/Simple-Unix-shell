@@ -1,6 +1,6 @@
-#include "sys/wait.h"
-#include "sys/types.h"
-#include "ctype.h"
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <ctype.h>
 
 #include "command.h"
 

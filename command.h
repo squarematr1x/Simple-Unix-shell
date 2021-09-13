@@ -3,8 +3,8 @@
 
 #define _XOPEN_SOURCE 700
 
-#include "ftw.h"
-#include "fcntl.h"
+#include <ftw.h>
+#include <fcntl.h>
 
 #include "util.h"
 
